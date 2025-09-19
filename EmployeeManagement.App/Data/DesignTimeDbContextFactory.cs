@@ -6,31 +6,19 @@ using System.IO;
 
 namespace EmployeeManagement.App.Data
 {
-    public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<EmployeeDbContext>
+    public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
+{
+    public ApplicationDbContext CreateDbContext(string[] args)
     {
-        public EmployeeDbContext CreateDbContext(string[] args)
-        {
-            // Build configuration to read environment variables or appsettings.json
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true)
-                .AddEnvironmentVariables(); // read ConnectionStrings__DefaultConnection from pipeline
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
-            var configuration = builder.Build();
+        // Read from environment variable
+        var connString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+        if (string.IsNullOrEmpty(connString))
+            throw new InvalidOperationException("Connection string not found. Make sure ConnectionStrings__DefaultConnection is set.");
 
-            var optionsBuilder = new DbContextOptionsBuilder<EmployeeDbContext>();
-
-            var connectionString = configuration.GetConnectionString("DefaultConnection")
-                                  ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
-
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                throw new InvalidOperationException("Connection string not found. Make sure ConnectionStrings__DefaultConnection is set.");
-            }
-
-            optionsBuilder.UseSqlServer(connectionString);
-
-            return new EmployeeDbContext(optionsBuilder.Options);
-        }
+        optionsBuilder.UseSqlServer(connString);
+        return new ApplicationDbContext(optionsBuilder.Options);
     }
+  }
 }
