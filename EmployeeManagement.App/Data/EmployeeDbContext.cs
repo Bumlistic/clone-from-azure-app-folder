@@ -37,3 +37,23 @@ namespace EmployeeManagement.App.Data
         }
     }
 }
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+
+namespace EmployeeManagement.App.Data
+{
+    public class EmployeeDbContextFactory : IDesignTimeDbContextFactory<EmployeeDbContext>
+    {
+        public EmployeeDbContext CreateDbContext(string[] args)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<EmployeeDbContext>();
+            
+            // Use your connection string here. You can read from environment variable in CI/CD.
+            var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+            optionsBuilder.UseSqlServer(connectionString);
+
+            return new EmployeeDbContext(optionsBuilder.Options);
+        }
+    }
+}
