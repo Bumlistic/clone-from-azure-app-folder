@@ -1,27 +1,27 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using EmployeeManagement.App.Data; // ✅ adjust if EmployeeDBContext is in another namespace
-using System;
+using Microsoft.Extensions.Configuration;
+using System.IO;
 
 namespace EmployeeManagement.App.Data
 {
-    public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<EmployeeDBContext>
+    public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<EmployeeDbContext>
     {
-        public EmployeeDBContext CreateDbContext(string[] args)
+        public EmployeeDbContext CreateDbContext(string[] args)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<EmployeeDBContext>();
+            // Load configuration from appsettings.json + environment variables
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true)
+                .AddEnvironmentVariables()
+                .Build();
 
-            // Get connection string from environment variable
-            var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
-
-            if (string.IsNullOrEmpty(connectionString))
-            {
-                throw new InvalidOperationException("Connection string not found. Make sure it is set in GitHub Actions.");
-            }
+            var optionsBuilder = new DbContextOptionsBuilder<EmployeeDbContext>();
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
 
             optionsBuilder.UseSqlServer(connectionString);
 
-            return new EmployeeDBContext(optionsBuilder.Options);
+            return new EmployeeDbContext(optionsBuilder.Options);
         }
     }
 }
