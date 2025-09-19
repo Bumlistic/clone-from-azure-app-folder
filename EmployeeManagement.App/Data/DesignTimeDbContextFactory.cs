@@ -1,5 +1,7 @@
+using EmployeeManagement.App.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using System;
 
 namespace EmployeeManagement.App.Data
 {
