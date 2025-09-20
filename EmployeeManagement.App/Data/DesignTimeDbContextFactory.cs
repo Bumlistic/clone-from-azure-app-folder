@@ -10,13 +10,14 @@ namespace EmployeeManagement.App.Data
         {
             var optionsBuilder = new DbContextOptionsBuilder<EmployeeDbContext>();
 
-            // Read connection string from environment variable set in GitHub Actions pipeline
-            string connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
+            // Look for the environment variable DB_CONNECTION_STRING (set in the pipeline)
+            var connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
 
-            if (string.IsNullOrWhiteSpace(connectionString))
+            if (string.IsNullOrEmpty(connectionString))
             {
                 throw new InvalidOperationException(
-                    "Connection string not found. Ensure DB_CONNECTION_STRING is set in the pipeline.");
+                    "Connection string not found. Ensure DB_CONNECTION_STRING is set in the pipeline."
+                );
             }
 
             optionsBuilder.UseSqlServer(connectionString);
